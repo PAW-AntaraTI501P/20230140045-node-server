@@ -1,14 +1,23 @@
-const express = require('express');
+const express = require("express");
+
 const app = express();
-const port = 3001;
+const port = 3000;
+app.use(express.json());
+//atur EJS sebagai view engine
+app.set("view engine", "ejs");
 
-const cors = require('cors');
-app.use(cors());
+app.get("/", (req, res) => {
+  res.render("index");//rendering the index.ejs file
+});
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello from node.js server' });
+app.get("/contact", (req, res) => {
+  res.render("contact");//rendering the contact.ejs file
+});
+
+app.use((req, res, next) => {
+  res.status(404).render("404"); 
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
