@@ -1,15 +1,15 @@
-require("dotenv").config();
+require("dotenv").config(); // Load environment variables from .env file
 const express = require("express");
 const app = express();
 const todoRoutes = require("./routes/todo.js");
 const { todos } = require("./routes/todo.js");
-const port = process.env.PORT;
+const port = process.env.PORT || 3000; // Use environment variable or default to 3000
 
 app.use(express.json());
-
-app.use("/todos", todoRoutes);
 //atur EJS sebagai view engine
 app.set("view engine", "ejs");
+
+app.use("/todos", todoRoutes);
 
 app.get("/", (req, res) => {
   res.render("index");//rendering the index.ejs file
@@ -24,7 +24,7 @@ app.get("/todos-data", (req, res) => {
 });
 
 app.get("/todos-list", (req, res) => {
-  res.render("todos-page", {todos: todos})
+  res.render("todos-page", { todos: todos });
 });
 
 app.use((req, res, next) => {

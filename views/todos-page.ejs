@@ -11,22 +11,153 @@
   </head>
   <body>
     <div class="container mt-5">
-      <h1>Daftar Tugas Saya</h1>
-      <p>Ini adalah halaman daftar tugas saya.</p>
+      <h1 class="mb-4 text-center">📋 Daftar Tugas Saya</h1>
 
-      <% if (todos && todos.length > 0) { %>
-      <ul class="list-group">
-        <% todos.forEach(function(todo) { %>
-        <li class="list-group-item">
-          ID: <%= todo.id %> Tugas: <%= todo.task %>
-        </li>
-        <% }); %>
-      </ul>
-      <% } else { %>
-      <p>Tidak ada tugas yang tersedia.</p>
-      <% } %>
+      <!-- Form Tambah Tugas -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Tambah Tugas Baru</h5>
+          <form id="addTodoForm">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="newTask"
+                placeholder="Contoh: Belajar Express JS"
+                required
+                autofocus
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Tambah Tugas</button>
+          </form>
+        </div>
+      </div>
 
-      <a href="/" class="btn btn-primary mt-3">Go to Home</a>
+      <!-- Daftar Tugas -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Daftar Tugas</h5>
+          <% if (todos && todos.length > 0) { %>
+            <ul class="list-group">
+              <% todos.forEach(function(todo) { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center text-capitalize">
+                  <span>
+                    ID: <%= todo.id %> - <span id="task-<%= todo.id %>"><%= todo.task %></span>
+                  </span>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-warning mr-2" onclick='showEditForm("<%- todo.id %>", "<%- todo.task %>")'>Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick='deleteTodo("<%- todo.id %>")'>Hapus</button>
+                  </div>
+                </li>
+                <!-- Form Edit -->
+                <li id="edit-form-<%- todo.id %>" class="list-group-item d-none">
+                  <form onsubmit='updateTodo(event, "<%- todo.id %>")'>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="edit-task-<%- todo.id %>"
+                        value="<%- todo.task %>"
+                        required
+                      />
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <button type="button" class="btn btn-secondary" onclick='hideEditForm("<%- todo.id %>")'>Batal</button>
+                      </div>
+                    </div>
+                  </form>
+                </li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <p class="text-muted">Tidak ada tugas yang tersedia.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <a href="/" class="btn btn-outline-primary mt-4">🏠 Kembali ke Home</a>
     </div>
+
+    <script>
+      // Tambah todo
+      document.getElementById('addTodoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskInput = document.getElementById('newTask');
+        const task = taskInput.value.trim();
+        if (!task) return alert("Tugas tidak boleh kosong!");
+
+        try {
+          const response = await fetch('/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task }),
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert('Gagal menambah tugas');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan');
+        }
+      });
+
+      // Tampilkan form edit
+      function showEditForm(id, task) {
+        document.getElementById(`edit-form-${id}`).classList.remove('d-none');
+        const input = document.getElementById(`edit-task-${id}`);
+        input.value = task;
+        input.focus();
+      }
+
+      // Sembunyikan form edit
+      function hideEditForm(id) {
+        document.getElementById(`edit-form-${id}`).classList.add('d-none');
+      }
+
+      // Update todo
+      async function updateTodo(event, id) {
+        event.preventDefault();
+        const task = document.getElementById(`edit-task-${id}`).value.trim();
+        if (!task) return alert("Tugas tidak boleh kosong!");
+
+        try {
+          const response = await fetch(`/todos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task }),
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert('Gagal mengupdate tugas');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan');
+        }
+      }
+
+      // Hapus todo
+      async function deleteTodo(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
+          try {
+            const response = await fetch(`/todos/${id}`, { method: 'DELETE' });
+
+            if (response.ok) {
+              window.location.reload();
+            } else {
+              alert('Gagal menghapus tugas');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan');
+          }
+        }
+      }
+    </script>
   </body>
 </html>
