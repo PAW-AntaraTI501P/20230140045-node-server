@@ -1,7 +1,7 @@
 require("dotenv").config(); // Load environment variables from .env file
 const express = require("express");
 const app = express();
-const todoRoutes = require("./routes/todo.js");
+const todoRoutes = require("./routes/tododb.js");
 const { todos } = require("./routes/todo.js");
 const db = require("./database/db.js"); // Import database connection
 const port = process.env.PORT || 3000; // Use environment variable or default to 3000
