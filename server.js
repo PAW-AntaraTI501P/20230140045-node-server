@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const todoRoutes = require("./routes/todo.js");
 const { todos } = require("./routes/todo.js");
+const db = require("./database/db.js"); // Import database connection
 const port = process.env.PORT || 3000; // Use environment variable or default to 3000
 
 app.use(express.json());
@@ -21,6 +22,15 @@ app.get("/contact", (req, res) => {
 
 app.get("/todos-data", (req, res) => {
   res.json(todos);
+});
+
+app.get("/todo-view", (req, res) =>{
+  db.query("SELECT * FROM todos", (err, todos) =>{
+    if (err) return res.status(500).send("Internal Server Error");
+    res.render("todo",{
+      todos: todos
+    })
+  });
 });
 
 app.get("/todos-list", (req, res) => {
