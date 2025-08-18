@@ -1,13 +1,18 @@
 
+<!-- Container utama dengan margin top untuk memberi jarak dari navbar -->
     <div class="container mt-5">
+      <!-- Judul halaman dengan emoji dan styling terpusat -->
       <h1 class="mb-4 text-center">📋 Daftar Tugas Saya</h1>
 
-      <!-- Form Tambah Tugas -->
+      <!-- Form untuk menambah tugas baru -->
       <div class="card mb-4 shadow-sm">
         <div class="card-body">
+          <!-- Judul card untuk form tambah tugas -->
           <h5 class="card-title">Tambah Tugas Baru</h5>
+          <!-- Form dengan ID untuk JavaScript event listener -->
           <form id="addTodoForm">
             <div class="form-group">
+              <!-- Input field untuk tugas baru dengan validasi required dan autofocus -->
               <input
                 type="text"
                 class="form-control"
@@ -17,31 +22,43 @@
                 autofocus
               />
             </div>
+            <!-- Button submit untuk menambah tugas -->
             <button type="submit" class="btn btn-primary">Tambah Tugas</button>
           </form>
         </div>
       </div>
 
-      <!-- Daftar Tugas -->
+      <!-- Card untuk menampilkan daftar tugas -->
       <div class="card shadow-sm">
         <div class="card-body">
+          <!-- Judul card untuk daftar tugas -->
           <h5 class="card-title">Daftar Tugas</h5>
+          <!-- Kondisi EJS: jika ada todos dan tidak kosong -->
           <% if (todos && todos.length > 0) { %>
+            <!-- List group Bootstrap untuk menampilkan daftar tugas -->
             <ul class="list-group">
+              <!-- Loop EJS untuk setiap todo dalam array todos -->
               <% todos.forEach(function(todo) { %>
+                <!-- Item list untuk setiap tugas dengan flexbox layout -->
                 <li class="list-group-item d-flex justify-content-between align-items-center text-capitalize">
                   <span>
+                    <!-- Menampilkan ID dan task, dengan span ID untuk JavaScript -->
                     ID: <%= todo.id %> - <span id="task-<%= todo.id %>"><%= todo.task %></span>
                   </span>
+                  <!-- Button group untuk tombol Edit dan Hapus -->
                   <div class="btn-group">
+                    <!-- Tombol Edit dengan onclick function JavaScript -->
                     <button class="btn btn-sm btn-warning mr-2" onclick='showEditForm("<%- todo.id %>", "<%- todo.task %>")'>Edit</button>
+                    <!-- Tombol Hapus dengan onclick function JavaScript -->
                     <button class="btn btn-sm btn-danger" onclick='deleteTodo("<%- todo.id %>")'>Hapus</button>
                   </div>
                 </li>
-                <!-- Form Edit -->
+                <!-- Form Edit yang tersembunyi dengan class d-none -->
                 <li id="edit-form-<%- todo.id %>" class="list-group-item d-none">
+                  <!-- Form untuk edit dengan onsubmit function JavaScript -->
                   <form onsubmit='updateTodo(event, "<%- todo.id %>")'>
                     <div class="input-group">
+                      <!-- Input field untuk edit task dengan value dari database -->
                       <input
                         type="text"
                         class="form-control"
@@ -50,7 +67,9 @@
                         required
                       />
                       <div class="input-group-append">
+                        <!-- Tombol Simpan untuk update -->
                         <button type="submit" class="btn btn-success">Simpan</button>
+                        <!-- Tombol Batal untuk membatalkan edit -->
                         <button type="button" class="btn btn-secondary" onclick='hideEditForm("<%- todo.id %>")'>Batal</button>
                       </div>
                     </div>
@@ -58,90 +77,118 @@
                 </li>
               <% }); %>
             </ul>
+          <!-- Kondisi EJS: jika tidak ada todos -->
           <% } else { %>
+            <!-- Pesan ketika tidak ada tugas -->
             <p class="text-muted">Tidak ada tugas yang tersedia.</p>
           <% } %>
         </div>
       </div>
 
+      <!-- Link tombol untuk kembali ke halaman home -->
       <a href="/" class="btn btn-outline-primary mt-4">🏠 Kembali ke Home</a>
     </div>
 
     <script>
-      // Tambah todo
+      // Event listener untuk form tambah todo
       document.getElementById('addTodoForm').addEventListener('submit', async (e) => {
+        // Mencegah form submit default
         e.preventDefault();
+        // Mengambil reference input field
         const taskInput = document.getElementById('newTask');
+        // Mengambil value dan menghilangkan whitespace
         const task = taskInput.value.trim();
+        // Validasi: jika kosong, tampilkan alert
         if (!task) return alert("Tugas tidak boleh kosong!");
 
         try {
+          // Kirim POST request ke server untuk menambah todo
           const response = await fetch('/todos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ task }),
           });
 
+          // Jika berhasil, reload halaman
           if (response.ok) {
             window.location.reload();
           } else {
+            // Jika gagal, tampilkan pesan error
             alert('Gagal menambah tugas');
           }
         } catch (error) {
+          // Tangani error dan tampilkan di console dan alert
           console.error('Error:', error);
           alert('Terjadi kesalahan');
         }
       });
 
-      // Tampilkan form edit
+      // Function untuk menampilkan form edit
       function showEditForm(id, task) {
+        // Menghilangkan class d-none untuk menampilkan form edit
         document.getElementById(`edit-form-${id}`).classList.remove('d-none');
+        // Mengambil reference input field edit
         const input = document.getElementById(`edit-task-${id}`);
+        // Mengisi input dengan value task yang akan diedit
         input.value = task;
+        // Memberikan focus ke input field
         input.focus();
       }
 
-      // Sembunyikan form edit
+      // Function untuk menyembunyikan form edit
       function hideEditForm(id) {
+        // Menambahkan class d-none untuk menyembunyikan form edit
         document.getElementById(`edit-form-${id}`).classList.add('d-none');
       }
 
-      // Update todo
+      // Function async untuk update todo
       async function updateTodo(event, id) {
+        // Mencegah form submit default
         event.preventDefault();
+        // Mengambil value dari input edit dan menghilangkan whitespace
         const task = document.getElementById(`edit-task-${id}`).value.trim();
+        // Validasi: jika kosong, tampilkan alert
         if (!task) return alert("Tugas tidak boleh kosong!");
 
         try {
+          // Kirim PUT request ke server untuk update todo
           const response = await fetch(`/todos/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ task }),
           });
 
+          // Jika berhasil, reload halaman
           if (response.ok) {
             window.location.reload();
           } else {
+            // Jika gagal, tampilkan pesan error
             alert('Gagal mengupdate tugas');
           }
         } catch (error) {
+          // Tangani error dan tampilkan di console dan alert
           console.error('Error:', error);
           alert('Terjadi kesalahan');
         }
       }
 
-      // Hapus todo
+      // Function async untuk hapus todo
       async function deleteTodo(id) {
+        // Konfirmasi dialog sebelum menghapus
         if (confirm('Apakah Anda yakin ingin menghapus tugas ini?')) {
           try {
+            // Kirim DELETE request ke server untuk hapus todo
             const response = await fetch(`/todos/${id}`, { method: 'DELETE' });
 
+            // Jika berhasil, reload halaman
             if (response.ok) {
               window.location.reload();
             } else {
+              // Jika gagal, tampilkan pesan error
               alert('Gagal menghapus tugas');
             }
           } catch (error) {
+            // Tangani error dan tampilkan di console dan alert
             console.error('Error:', error);
             alert('Terjadi kesalahan');
           }

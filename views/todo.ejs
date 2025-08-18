@@ -1,10 +1,14 @@
 
+<!-- Container utama Bootstrap dengan margin top untuk spacing -->
     <div class="container mt-5">
+      <!-- Judul halaman dengan alignment center -->
       <h1 class="text-center">Todo List</h1>
 
-      <!-- Form to Add New Todo -->
+      <!-- Form untuk menambah todo baru -->
       <form id="addTodoForm" class="my-4">
+        <!-- Input group Bootstrap untuk styling form yang rapi -->
         <div class="input-group">
+          <!-- Input field untuk task baru dengan validasi required -->
           <input
             type="text"
             id="newTask"
@@ -12,28 +16,36 @@
             placeholder="Add a new task..."
             required
           />
+          <!-- Div untuk mengelompokkan button dengan input -->
           <div class="input-group-append">
+            <!-- Button submit untuk menambah task -->
             <button type="submit" class="btn btn-primary">Add Task</button>
           </div>
         </div>
       </form>
 
-      <!-- List of Todos -->
+      <!-- List untuk menampilkan daftar todos menggunakan Bootstrap list-group -->
       <ul id="todoList" class="list-group">
+        <!-- Loop EJS untuk setiap todo dalam array todos -->
         <% todos.forEach(todo=> { %>
+        <!-- Item list dengan flexbox untuk layout horizontal -->
         <li
           class="list-group-item d-flex justify-content-between align-items-center"
         >
+          <!-- Span untuk menampilkan text task, dengan conditional class untuk completed -->
           <span class="<%= todo.completed ? 'completed' : '' %>">
             <%= todo.task %>
           </span>
+          <!-- Div container untuk button-button aksi -->
           <div>
+            <!-- Button Edit dengan data attribute untuk menyimpan ID todo -->
             <button
               class="btn btn-sm btn-success mr-2 editBtn"
               data-id="<%= todo.id %>"
             >
               Edit
             </button>
+            <!-- Button Delete dengan data attribute untuk menyimpan ID todo -->
             <button
               class="btn btn-sm btn-danger deleteBtn"
               data-id="<%= todo.id %>"
@@ -42,10 +54,11 @@
             </button>
           </div>
         </li>
+        <!-- Akhir loop EJS -->
         <% }); %>
       </ul>
 
-      <!-- Edit Todo Modal -->
+      <!-- Modal Bootstrap untuk edit todo -->
       <div
         id="editModal"
         class="modal fade"
@@ -54,10 +67,14 @@
         aria-labelledby="editModalLabel"
         aria-hidden="true"
       >
+        <!-- Dialog container modal -->
         <div class="modal-dialog" role="document">
+          <!-- Content modal -->
           <div class="modal-content">
+            <!-- Header modal dengan judul dan tombol close -->
             <div class="modal-header">
               <h5 class="modal-title" id="editModalLabel">Edit Todo</h5>
+              <!-- Tombol close modal -->
               <button
                 type="button"
                 class="close"
@@ -67,10 +84,14 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
+            <!-- Body modal yang berisi form edit -->
             <div class="modal-body">
+              <!-- Form untuk edit todo -->
               <form id="editTodoForm">
                 <div class="form-group">
+                  <!-- Label untuk input field -->
                   <label for="editTask">Task</label>
+                  <!-- Input field untuk edit task -->
                   <input
                     type="text"
                     id="editTask"
@@ -78,6 +99,7 @@
                     required
                   />
                 </div>
+                <!-- Button submit untuk menyimpan perubahan -->
                 <button type="submit" class="btn btn-primary mt-3">
                   Save Changes
                 </button>
@@ -88,66 +110,87 @@
       </div>
     </div>
 
-    <!-- jQuery -->
+    <!-- Import library jQuery dari CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap 4 JS + Popper -->
+    <!-- Import Popper.js untuk Bootstrap modal functionality -->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <!-- Import Bootstrap 4 JavaScript untuk komponen interaktif -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+      // jQuery document ready function - dijalankan setelah DOM selesai dimuat
       $(document).ready(function () {
+        // Variabel untuk menyimpan ID todo yang sedang diedit
         let editId;
 
-        // Add new todo
+        // Event handler untuk form tambah todo baru
         $("#addTodoForm").on("submit", function (e) {
+          // Mencegah form submit default
           e.preventDefault();
+          // Mengambil value dari input dan menghilangkan whitespace
           const task = $("#newTask").val().trim();
+          // Jika task tidak kosong, kirim AJAX request
           if (task) {
+            // AJAX POST request untuk menambah todo baru
             $.ajax({
               url: "/todos",
               type: "POST",
               contentType: "application/json",
               data: JSON.stringify({ task: task }),
               success: function () {
+                // Jika berhasil, reload halaman
                 location.reload();
               },
               error: function (error) {
+                // Jika error, tampilkan di console
                 console.error("Error adding task:", error.responseText);
               },
             });
           }
         });
-        // Delete a todo
+        // Event handler untuk tombol delete todo
         $(".deleteBtn").on("click", function () {
+          // Mengambil ID todo dari data attribute
           const id = $(this).data("id");
+          // AJAX DELETE request untuk menghapus todo
           $.ajax({
             url: "/todos/" + id,
             type: "DELETE",
             success: function () {
+              // Jika berhasil, reload halaman
               location.reload();
             },
           });
         });
 
-        // Show edit modal
+        // Event handler untuk tombol edit - menampilkan modal edit
         $(".editBtn").on("click", function () {
+          // Menyimpan ID todo yang akan diedit
           editId = $(this).data("id");
+          // Mengambil text task dari elemen span terdekat
           const currentTask = $(this).closest("li").find("span").text();
+          // Mengisi input field edit dengan task yang akan diedit
           $("#editTask").val(currentTask);
+          // Menampilkan modal edit
           $("#editModal").modal("show");
         });
 
-        // Update todo
+        // Event handler untuk form edit todo
         $("#editTodoForm").on("submit", function (e) {
+          // Mencegah form submit default
           e.preventDefault();
+          // Mengambil value dari input edit dan menghilangkan whitespace
           const task = $("#editTask").val().trim();
+          // Jika task tidak kosong, kirim AJAX request
           if (task) {
+            // AJAX PUT request untuk update todo
             $.ajax({
               url: "/todos/" + editId,
               type: "PUT",
               data: JSON.stringify({ task: task, completed: false }),
               contentType: "application/json",
               success: function () {
+                // Jika berhasil, reload halaman
                 location.reload();
               },
             });

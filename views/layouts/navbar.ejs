@@ -1,6 +1,10 @@
+<!-- Navigation bar Bootstrap dengan class untuk expand pada layar lg dan styling bg-body-tertiary -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <!-- Container fluid untuk navbar yang mengisi lebar penuh -->
   <div class="container-fluid">
+    <!-- Brand/logo navbar dengan link ke halaman utama -->
     <a class="navbar-brand" href="#">Navbar</a>
+    <!-- Button toggler untuk mobile view - menampilkan/menyembunyikan menu pada layar kecil -->
     <button
       class="navbar-toggler"
       type="button"
@@ -10,22 +14,30 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
+      <!-- Icon hamburger untuk button toggler -->
       <span class="navbar-toggler-icon"></span>
     </button>
+    <!-- Div yang akan collapse/expand ketika tombol toggler diklik -->
     <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Unordered list untuk menu navigasi -->
       <ul class="navbar-nav">
+        <!-- Menu item Home dengan class active (menandakan halaman saat ini) -->
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Home</a>
         </li>
+        <!-- Menu item Todo Array - mengarah ke halaman todo dengan data array -->
         <li class="nav-item">
           <a class="nav-link" href="/todo-list">Todo Array</a>
         </li>
+        <!-- Menu item Todo DB - mengarah ke halaman todo dengan data dari database -->
         <li class="nav-item">
           <a class="nav-link" href="/todo-view">Todo DB</a>
         </li>
+        <!-- Menu item Contact - mengarah ke halaman kontak -->
         <li class="nav-item">
           <a class="nav-link" href="/contact">Contact</a>
         </li>
+        <!-- Menu item disabled - tidak dapat diklik (sebagai contoh) -->
         <li class="nav-item">
           <a class="nav-link disabled" aria-disabled="true">Disabled</a>
         </li>
