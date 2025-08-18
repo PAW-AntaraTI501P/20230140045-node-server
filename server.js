@@ -90,8 +90,8 @@ app.get("/todos-list", (req, res) => {
 
 // Middleware untuk menangani route yang tidak ditemukan (404)
 app.use((req, res, next) => {
-  // Render halaman 404 dengan status code 404
-  res.status(404).render("404"); 
+  // Kirim response text sederhana jika halaman tidak ditemukan
+  res.status(404).send("404 - Page Not Found");
 });
 
 // Menjalankan server pada port yang telah ditentukan
