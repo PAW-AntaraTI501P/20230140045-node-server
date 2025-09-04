@@ -4,6 +4,7 @@ require("dotenv").config();
 // Mengimport framework Express.js untuk membuat web server
 const express = require("express");
 
+const cors = require("cors");
 // Membuat instance aplikasi Express
 const app = express();
 
@@ -19,12 +20,16 @@ const port = process.env.PORT || 3000;
 // Mengimport middleware express-ejs-layouts untuk layout EJS
 const expressLayouts = require("express-ejs-layouts");
 
+const authRoutes = require("./routes/auth");
+const authMiddleware = require("./middleware/auth");
+
 // Mengaktifkan middleware express-ejs-layouts
 app.use(expressLayouts);
 
 // Middleware untuk parsing JSON request body
 app.use(express.json());
 
+app.use(cors());
 // Mengatur EJS sebagai template engine untuk rendering view
 app.set("view engine", "ejs");
 
@@ -184,12 +189,16 @@ app.delete("/api/todos/:id", (req, res) => {
         res.json({ message: 'Todo deleted successfully' });
     });
 });
+app.use("/api/auth", authRoutes);
+app.use("/api/todos", authMiddleware, todoRoutes);
 
 // Middleware untuk menangani route yang tidak ditemukan (404)
 app.use((req, res, next) => {
   // Kirim response text sederhana jika halaman tidak ditemukan
   res.status(404).send("404 - Page Not Found");
 });
+
+
 
 // Menjalankan server pada port yang telah ditentukan
 app.listen(port, () => {
